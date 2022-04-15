@@ -1,6 +1,7 @@
 import transmitter
 import canal
 import random
+import decoder
 
 def generate(n):
     for i in range(0,n):
@@ -8,19 +9,32 @@ def generate(n):
 
 t = transmitter.Transmitter()
 c = canal.Canal()
+d = decoder.Decoder()
 
 rawData = []
-generate(40)
+generate(42)
 
-rawData = t.tripleBit(rawData) # po potrojeniu
-rawData = t.makePacket(rawData) # po zrobieniu pakietow
+print("Dane wejsciowe:")
+[print(x,'',end='') for x in rawData]
+print("Dlugosc: ", len(rawData))
+print()
+
+codedData = t.tripleBit(rawData) # po potrojeniu
+packets = t.makePacket(codedData) # po zrobieniu pakietow
 
 print("Pakiety: ")
-[print(x) for x in t.packetList]
+[print(x) for x in packets]
 
 print()
 
-c.signalDistortion(t.packetList)
+c.signalDistortion(packets)
 
 print("Pakiety po przejsciu przez kanal" )
-[print(x) for x in t.packetList]
+[print(x) for x in packets]
+
+decodedPacket = d.decoding(packets)
+
+print()
+print("Dane wyjsciowe: ")
+[print(x,'',end='') for x in decodedPacket]
+print("Dlugosc: ", len(decodedPacket))
