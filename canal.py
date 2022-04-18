@@ -1,7 +1,11 @@
 import random
 
 class Canal:
-    def signalDistortion(self, package):
-        for i in package:
+    def signalDistortion(self, p, rnd):
+        for i in p:
             for j in range(0,len(i)):
-                 i[j]= random.randint(0,1)
+                if random.random() < rnd:
+                    if i[j] == 0:
+                        i[j] = 1
+                    else:
+                        i[j] = 0
