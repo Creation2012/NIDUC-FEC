@@ -10,11 +10,15 @@ def generate(n):
 
 def check():
     x = 0 # ilosc zmienionych bitow
-    for i,j in zip(inputData,decodedPacket):
+    for i,j in zip(inputData,outputData):
         if i != j:
             x = x + 1
     return x
 
+def check2():
+    x = 0
+    for i, j in zip(packets, packetsFalse):
+        return
 
 t = transmitter.Transmitter()
 c = canal.Canal()
@@ -31,11 +35,6 @@ print("Dane wejsciowe:")
 [print(x,'',end='') for x in inputData]
 print('\n')
 
-inputPacket = t.makePacket(inputData)
-
-print("Pakiety z danych wejsciowych: ")
-[print(x) for x in inputPacket]
-print()
 codedData = t.tripleBit(inputData) # potrojone bity
 packets = t.makePacket(codedData) # pakiety
 
@@ -54,12 +53,12 @@ print()
 print("Pakiety po przejsciu przez kanal: " )
 [print(x) for x in packetsFalse]
 
-decodedPacket = d.decoding(packetsFalse)
+outputData = d.decoding(packetsFalse)
 
 print()
 print("Dane wyjsciowe: ")
-[print(x,'',end='') for x in decodedPacket]
+[print(x,'',end='') for x in outputData]
 
 print('\n')
-print("Znieksztalcony sygnal/porownanie: ")
+print("Bledy ktorych nie udalo sie naprawic: ")
 print(check())
