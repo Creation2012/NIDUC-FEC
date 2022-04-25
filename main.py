@@ -3,6 +3,7 @@ import canal
 import random
 import decoder
 import copy
+import numpy as np
 
 def generate(n):
     for i in range(0,n):
@@ -36,6 +37,8 @@ print("Dane wejsciowe:")
 print('\n')
 
 codedData = t.tripleBit(inputData) # potrojone bity
+#print("POTROJONE:")
+#[print(x, end='') for x in codedData]
 packets = t.makePacket(codedData) # pakiety
 
 print("Pakiety po potrojeniu bitow: ")
@@ -56,9 +59,35 @@ print("Pakiety po przejsciu przez kanal: " )
 outputData = d.decoding(packetsFalse)
 
 print()
+
+trojki_in = np.array_split([item for sublist in packets for item in sublist], len(inputData))
+trojki_out = np.array_split([item for sublist in packetsFalse for item in sublist], len(outputData))
+print("trojki przed przejsciem przez kanal:")
+print(*trojki_in) 
+print()
+print("trojki po przejsciu przez kanal:")
+print(*trojki_out)
+print()
+roznice = []
+duze_bledy = []
+male_bledy = []
+for pair in list(zip(trojki_in, trojki_out)):
+    roznica = np.sum(pair[0] != pair[1])
+    roznice.append(roznica)
+counter = 0
+for diff in roznice:
+    if diff >= 2:
+        duze_bledy.append(counter)
+    elif diff >= 1:
+        male_bledy.append(counter)
+    counter += 1
+print(f"ilosc roznych bitow pomiedzy trojkami: {roznice}")
+print(f"indeksy duzyc bledow: {duze_bledy}")
+print(f"indeksy malych bledow: {male_bledy}")
+
+print()
 print("Dane wyjsciowe: ")
 [print(x,'',end='') for x in outputData]
+print()
 
-print('\n')
-print("Bledy ktorych nie udalo sie naprawic: ")
-print(check())
+print("Bledy ktorych nie udalo sie naprawic: " + str(check()))
