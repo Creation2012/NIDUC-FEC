@@ -1,4 +1,5 @@
 import numpy as np
+from functools import reduce
 
 class Decoder():
     def decoding(self, packet):
@@ -37,3 +38,11 @@ class Decoder():
         
     def unpack(self):
         return
+
+    # Hamming Error Correction
+
+    def hamDetectError(self, data):
+        return reduce(lambda x, y: x^y, [i for i, bit in enumerate(data) if bit and i != 0])
+
+    def hamRepair(self, data, x):
+        data[x] ^= 1
