@@ -2,10 +2,16 @@ import transmitter
 import canal
 import random
 import decoder
+import csvData
 import copy
 import numpy as np
 import komm as ko
+import sys
 from functools import reduce
+
+# argument 1 - 1) potrajanie bitow, 2) hamming
+# argument 2 - ilosc bitow (liczba calkowita n)
+# argument 3 - kanal transmisyjny (tylko dla potrajania bitow)
 
 def generate(n):
     for i in range(0,n):
@@ -22,43 +28,26 @@ t = transmitter.Transmitter()
 c = canal.Canal()
 d = decoder.Decoder()
 
-inputData = [] # dane wejsciowe
+inputData = []
 
-print('1) Potrajanie bitow')
-print('2) Kod Hamminga')
-
-x = int(input())
+x = int(sys.argv[1])
 
 if x == 1:
-
-    print("Podaj ilosc bitow do wygenerowania")
-    n = int(input())
+    n = int(sys.argv[2]) # ilosc bitow do wygenerowania
 
     generate(n)
-
-    print()
-
-    print("Dane wejsciowe:")
-    [print(x,'',end='') for x in inputData]
-    print('\n')
 
     codedData = t.tripleBit(inputData) # potrojone bity
     packets = t.makePacket(codedData, 255) # pakiety
 
-    print("Pakiety po potrojeniu bitow: ")
-    [print(x) for x in packets]
-
-    print()
-
-    print("Wybierz kanal transmisji")
-    print("1) Kanal AWGN")
+    #print("1) Kanal AWGN")
     awg = ko.AWGNChannel(snr=100.0, signal_power=1.0)
-    print("2) Kanal Binary Symmetric Channel")
+    #print("2) Kanal Binary Symmetric Channel")
     bsc = ko.BinarySymmetricChannel(0.1)
-    print("3) Kanal Discrete Memoryless Channel")
+    #print("3) Kanal Discrete Memoryless Channel")
     dmc = ko.DiscreteMemorylessChannel([[0.9, 0.1], [0.2, 0.8]])
     
-    x = int(input())
+    x = int(sys.argv[3]) 
 
     packetsFalse = copy.deepcopy(packets)
     y = list()
@@ -74,8 +63,6 @@ if x == 1:
         for i in packetsFalse:
             y.append(bsc(i))
 
-        #[y2.append(list(map(int,i))) for i in y]
-
         packetsFalse = y
     
     elif x == 3:
@@ -83,15 +70,11 @@ if x == 1:
             y.append(dmc(i))
 
         packetsFalse = y
-        
-    print()
 
-    print("Pakiety po przejsciu przez kanal: " )
-    [print(x) for x in packetsFalse]
+    #print("Pakiety po przejsciu przez kanal: " )
+    #[print(x) for x in packetsFalse]
 
     outputData = d.decoding(packetsFalse)
-
-    print()
 
     trojki_in = np.array_split([item for sublist in packets for item in sublist], len(inputData))
     trojki_out = np.array_split([item for sublist in packetsFalse for item in sublist], len(outputData))
@@ -114,22 +97,21 @@ if x == 1:
         elif diff >= 1:
             male_bledy.append(counter)
         counter += 1
-    print(f"ilosc roznych bitow pomiedzy trojkami: {roznice}")
-    print(f"indeksy duzyc bledow: {duze_bledy}")
-    print(f"indeksy malych bledow: {male_bledy}")
+    #print(f"ilosc roznych bitow pomiedzy trojkami: {roznice}")
+    #print(f"indeksy duzyc bledow: {duze_bledy}")
+    #print(f"indeksy malych bledow: {male_bledy}")
 
-    print()
-    print("Dane wyjsciowe: ")
-    [print(x,'',end='') for x in outputData]
-    print()
+    csvData.dataToFile(n, len(duze_bledy))
+    #print()
+    #print("Dane wyjsciowe: ")
+    #[print(x,'',end='') for x in outputData]
+    #print()
 
-    print("Bledy ktorych nie udalo sie naprawic: " + str(check()))
+    #print("Bledy ktorych nie udalo sie naprawic: " + str(check()))
 
 elif x == 2:
-    print("Ustawianie ")
+    n = int(sys.agrv[1]) 
 
-    print("Podaj ilosc bitow do wygenerowania")
-    n = int(input()) 
     dim = lambda m: 2**m - m - 1
     red = 2
     while n != dim(red) :
@@ -146,12 +128,10 @@ elif x == 2:
     #[print(x,'',end='') for x in inputData]
     #print('\n')
 
-    print("Wygenerowany ciag bitow")
-    for i in range(0,len(inputData)):
-        print(inputData[i],'',end='')
+    #print("Wygenerowany ciag bitow")
+    #for i in range(0,len(inputData)):
+    #    print(inputData[i],'',end='')
 
-    print()
-            
     #codedData = t.hamMakePacket(inputData, parityBits) 
 
     #print("Spakowany ciag bitow (z wyliczonymi bitami parzystosci)")
@@ -161,40 +141,33 @@ elif x == 2:
     #    if(i+1) % len(inputData)**(1/2) == 0:
     #        print()
 
-    print("Zakodowany pakiet")
+    #print("Zakodowany pakiet")
     codedData = code.encode(inputData)
-    print(codedData)
-    print()
+    #print(codedData)
+    #print()
     bsc = ko.BinarySymmetricChannel(0.5)
 
-    print("Pakiet po przejsciu przez kanal (1 - error)")
+    #print("Pakiet po przejsciu przez kanal (1 - error)")
     y = bsc(codedData)
 
-    print(y)
-    print("Wykrycie bledu")
+    #print(y)
+    #print("Wykrycie bledu")
     detectError = d.hamDetectError(y)
-    print(detectError)
+    #print(detectError)
 
     y = code.decode(y)
 
-    print("Po dekodowaniu")
-    print(y)
+    #print("Po dekodowaniu")
+    #print(y)
 
     #d.hamRepair(y, detectError)
 
-    print("Naprawiony sygnal")
+    #print("Naprawiony sygnal")
 
-    for i in range(len(y)):
-        if i == detectError:
-            print('(%1d),' %y[i], end='')
-        else:
-            print('%3d,' %y[i], end='')
-        if(i+1) % len(inputData)**(1/2) == 0:
-            print()
-
-
-    print()
-
-    print(y)
-
-    print()
+    #for i in range(len(y)):
+    #    if i == detectError:
+    #        print('(%1d),' %y[i], end='')
+    #    else:
+    #        print('%3d,' %y[i], end='')
+    #    if(i+1) % len(inputData)**(1/2) == 0:
+    #        print()
