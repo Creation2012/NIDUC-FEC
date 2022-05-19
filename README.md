@@ -17,8 +17,9 @@ Realizuje generowanie losowych danych wejściowych, przetwarzanie ich przez kana
 # Uruchamianie
 Program uruchamiany z linii komend, z podanymi argumentami:
 ```
-python main.py [algorytm] [bity] [kanal]
+python main.py [ilosc prob] [algorytm] [bity] [kanal]
 ```
+- ilosc prob - ile razy powtorzyc caly przesył danych
 - algorytm - do wyboru (1 - potrajanie bitow, 2 - kod Hamminga)
 - bity - generowana ilosc bitow do przetworzenia
 - kanal - kanal transmisyjny (1 - AWGN, 2 - BSC, 3 - DMC)
