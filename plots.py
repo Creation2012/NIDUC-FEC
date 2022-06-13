@@ -20,4 +20,4 @@ def line():
 
 boxPlot()
 histograms()
-line()
+#line()
